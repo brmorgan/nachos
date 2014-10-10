@@ -64,6 +64,14 @@ public class Condition2 {
      */
     public void wakeAll() {
 	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
+	
+	Machine.interrupt().disable();
+	for(KThread thread = waitQueue.nextThread(); thread != null; thread = waitQueue.nextThread())
+	{
+		thread.ready();
+	}
+	Machine.interrupt().enable();
+	
     }
 
     private Lock conditionLock;
