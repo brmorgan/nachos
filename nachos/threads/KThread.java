@@ -186,6 +186,7 @@ public class KThread {
 	
 	Machine.interrupt().disable();
 	
+	// Added 8 Oct 2014
 	ThreadQueue tempJQ = currentThread.joinQueue;
 	
 	if(tempJQ != null)
@@ -197,7 +198,7 @@ public class KThread {
 			thread = tempJQ.nextThread();
 		}
 	}
-	
+	// --
 
 	Machine.autoGrader().finishingCurrentThread();
 
@@ -289,9 +290,10 @@ public class KThread {
     public void join() {
 	Lib.debug(dbgThread, "Joining to thread: " + toString());
 	
-	Machine.interrupt().disable();
 	Lib.assertTrue(this != currentThread);
 	
+	// Added 8 Oct 2014
+	Machine.interrupt().disable();
 	if(joinQueue == null)
 	{
 		joinQueue = ThreadedKernel.scheduler.newThreadQueue(true);
@@ -304,6 +306,7 @@ public class KThread {
 	}
 	
 	Machine.interrupt().enable();
+	// --
     }
 
     /**

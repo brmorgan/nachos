@@ -28,7 +28,8 @@ public class Alarm {
      * that should be run.
      */
     public void timerInterrupt() {
-	
+    	
+    	// Added 8 Oct 2014
 		for(int i=times.size()-1; i>=0; i-- )
 		{
 			if(Machine.timer().getTime() >= times.get(i))
@@ -38,6 +39,8 @@ public class Alarm {
 				times.remove(i);
 			}
 		}
+		// --
+		
 		KThread.yield();
 	
     }
@@ -61,11 +64,13 @@ public class Alarm {
 	long wakeTime = Machine.timer().getTime() + x;
 	KThread tempthread = KThread.currentThread();
 	
+	// Added 8 Oct 2014
 	Machine.interrupt().disable();
 	times.add(wakeTime);
 	waitingThreads.put(wakeTime, tempthread);
 	KThread.sleep();
 	Machine.interrupt().enable();
+	// --
 	
 	//while (wakeTime > Machine.timer().getTime())
 	//    KThread.yield();

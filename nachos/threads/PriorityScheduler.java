@@ -198,8 +198,12 @@ public class PriorityScheduler extends Scheduler {
 	 * threads to the owning thread.
 	 */
 	public boolean transferPriority;
+	
+	// Added 8 Oct 2014
 	LinkedList<KThread> waitQueue = new LinkedList<KThread>();
 	ThreadState haslock = null;
+	// --
+	
     }
 
     /**
@@ -241,6 +245,7 @@ public class PriorityScheduler extends Scheduler {
 	    return getEffectivePriority(new HashSet<ThreadState>());
 	}
 	
+	// Whole method added 8 Oct 2014
 	private int getEffectivePriority(HashSet<ThreadState> threadstates)
 	{
 		if(threadstates.contains(this))
@@ -337,7 +342,11 @@ public class PriorityScheduler extends Scheduler {
 	protected KThread thread;
 	/** The priority of the associated thread. */
 	protected int priority;
+	
+	// Added 8 Oct 2014
 	protected int effectivepriority;
 	protected LinkedList<PriorityQueue> donateQueue = new LinkedList<PriorityQueue>();
+	// --
+	
     }
 }
