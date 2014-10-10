@@ -468,7 +468,7 @@ public class KThread {
     private static int numCreated = 0;
 
     private static ThreadQueue readyQueue = null;
-    private ThreadQueue joinQueue = null;
+    protected ThreadQueue joinQueue = null;
     private static KThread currentThread = null;
     private static KThread toBeDestroyed = null;
     private static KThread idleThread = null;
