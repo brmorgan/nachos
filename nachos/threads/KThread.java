@@ -274,9 +274,22 @@ public class KThread {
      */
     public void join() {
 	Lib.debug(dbgThread, "Joining to thread: " + toString());
-
+	
+	Machine.interrupt().disable();
 	Lib.assertTrue(this != currentThread);
-
+	
+	if(joinQueue == null)
+	{
+		joinQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+		joinQueue.acquire(this);
+	}
+	if(this.status != statusFinished)
+	{
+		joinQueue.waitForAccess(this);
+		this.sleep();
+	}
+	
+	Machine.interrupt().enable();
     }
 
     /**
@@ -441,6 +454,7 @@ public class KThread {
     private static int numCreated = 0;
 
     private static ThreadQueue readyQueue = null;
+    private ThreadQueue joinQueue = null;
     private static KThread currentThread = null;
     private static KThread toBeDestroyed = null;
     private static KThread idleThread = null;
