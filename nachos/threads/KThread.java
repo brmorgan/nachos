@@ -201,7 +201,7 @@ public class KThread {
 	// --
 
 	Machine.autoGrader().finishingCurrentThread();
-
+	
 	Lib.assertTrue(toBeDestroyed == null);
 	toBeDestroyed = currentThread;
 
@@ -294,11 +294,7 @@ public class KThread {
 	
 	// Added 8 Oct 2014
 	Machine.interrupt().disable();
-	if(joinQueue == null)
-	{
-		joinQueue = ThreadedKernel.scheduler.newThreadQueue(true);
-		joinQueue.acquire(this);
-	}
+	joinQueue.acquire(this);
 	if(this.status != statusFinished)
 	{
 		this.joinQueue.waitForAccess(currentThread);
@@ -426,7 +422,7 @@ public class KThread {
 
 	private int which;
     }
-
+    
     /**
      * Tests whether this module is working.
      */
@@ -438,17 +434,18 @@ public class KThread {
     	KThread threadX = new KThread(new PingTest(1));
     	threadX.setName("threadX");
     	threadX.fork();
-    	threadX.join();
     	//SO - Next see what happens when the thread is joined after it is completed.
     	KThread threadY = new KThread(new PingTest(2));
+     	threadX.join();
     	threadY.setName("threadY");
     	threadY.fork();
     	threadY.yield();
     	threadY.join();
     	
-	
-	new KThread(new PingTest(1)).setName("forked thread").fork();
-	new PingTest(0).run();
+    	//new KThread(new PingTest(1)).setName("forked thread").fork();
+    	//new PingTest(0).run();
+    	
+    	Boat.selfTest();
     }
 
     private static final char dbgThread = 't';

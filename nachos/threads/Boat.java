@@ -10,7 +10,7 @@ public class Boat
     private static int waitingChildren;
     private static int childrenOffBoat;
     private static boolean boatAtOahu;
-    private static Lock oahuLock, molokaiLock;
+    private static Lock oahuLock = new Lock(), molokaiLock = new Lock();
     private static Condition2 sleepAdultOahu = new Condition2(oahuLock);
     private static Condition2 sleepChildOahu = new Condition2(oahuLock);
     private static Condition2 sleepAdultMolokai = new Condition2(molokaiLock);
@@ -22,14 +22,14 @@ public class Boat
     {
 	BoatGrader b = new BoatGrader();
 	
-	System.out.println("\n ***Testing Boats with only 2 children***");
-	begin(0, 2, b);
+//	System.out.println("\n ***Testing Boats with only 2 children***");
+//	begin(0, 2, b);
 
 //	System.out.println("\n ***Testing Boats with 2 children, 1 adult***");
 //  	begin(1, 2, b);
 
-//  	System.out.println("\n ***Testing Boats with 3 children, 3 adults***");
-//  	begin(3, 3, b);
+  	System.out.println("\n ***Testing Boats with 3 children, 3 adults***");
+  	begin(3, 3, b);
     }
 
     public static void begin( int adults, int children, BoatGrader b )
@@ -107,7 +107,7 @@ public class Boat
 	    	if(childrenOnOahu > 1 || !boatAtOahu || onBoat > 0)
 	    	{
 	    		sleepAdultOahu.sleep();
-	    		oahuLock.release();
+		    	oahuLock.release();
 	    	}
 	    	else
 	    	{
@@ -120,7 +120,7 @@ public class Boat
 	    	
 	    		molokaiLock.acquire();
 	    		adultsOnMolokai++;
-	    		sleepChildMolokai.wakeAll();
+	    		sleepChildMolokai.wake();
 	    		sleepAdultMolokai.sleep();
 	    		molokaiLock.release();
 	    	}
@@ -140,7 +140,7 @@ public class Boat
     		oahuLock.acquire();
     		if(childrenOnOahu == 1)
     		{
-    			sleepAdultOahu.wakeAll();
+    			sleepAdultOahu.wake();
     		}
     		if(waitingChildren >= 2 || !boatAtOahu)
     		{
