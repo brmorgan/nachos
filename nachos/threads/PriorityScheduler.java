@@ -268,7 +268,8 @@ public class PriorityScheduler extends Scheduler {
 				}
 			}
 		}
-		PriorityQueue myQueue = (PriorityQueue) thread.joinQueue;
+		
+		PriorityQueue myQueue = (PriorityQueue) this.thread.joinQueue;
 		if(myQueue.transferPriority)
 		{
 			for(KThread tempthread : myQueue.waitQueue)

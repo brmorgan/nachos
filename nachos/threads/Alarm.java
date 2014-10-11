@@ -30,15 +30,18 @@ public class Alarm {
     public void timerInterrupt() {
     	
     	// Added 8 Oct 2014
-		for(int i=times.size()-1; i>=0; i-- )
-		{
-			if(Machine.timer().getTime() >= times.get(i))
+    	if(times != null)
+    	{
+			for(int i=times.size()-1; i>=0; i-- )
 			{
-				waitingThreads.get(times.get(i)).ready();
-				waitingThreads.remove(waitingThreads.get(times.get(i)));
-				times.remove(i);
+				if(Machine.timer().getTime() >= times.get(i))
+				{
+					waitingThreads.get(times.get(i)).ready();
+					waitingThreads.remove(waitingThreads.get(times.get(i)));
+					times.remove(i);
+				}
 			}
-		}
+    	}
 		// --
 		
 		KThread.yield();
