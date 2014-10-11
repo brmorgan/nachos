@@ -359,9 +359,6 @@ public class PriorityScheduler extends Scheduler {
 
 		KThread thread1, thread2;
 		
-		 //  This runs t1 with priority 7, and t2 with priority 4, but
-		 //  half-way through t1's process its priority is lowered to 2.
-		
 		System.out.println( "Priority Scheduler Test:" );
 
 		thread1 = new KThread(new Runnable() 
