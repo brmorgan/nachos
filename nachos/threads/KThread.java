@@ -443,7 +443,7 @@ public class KThread {
     	KThread threadY = new KThread(new PingTest(2));
     	threadY.setName("threadY");
     	threadY.fork();
-    	threadY.yied();
+    	threadY.yield();
     	threadY.join();
     	
 	
