@@ -26,3 +26,15 @@
 /ThreadQueue.class
 /ThreadedKernel.class
 /Boat$2.class
+/Alarm$Sleeps.class
+/PrioritySchedulerTest$NamedLock.class
+/PrioritySchedulerTest$PingPongWorker.class
+/PrioritySchedulerTest$PriorityDonationWorker.class
+/PrioritySchedulerTest.class
+/PriorityScheduler$1.class
+/PriorityScheduler$2.class
+/PriorityScheduler$3.class
+/PriorityScheduler$4.class
+/PriorityScheduler$5.class
+/PriorityScheduler$6.class
+/PriorityScheduler$7.class

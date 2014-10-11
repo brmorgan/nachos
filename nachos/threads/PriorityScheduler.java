@@ -34,6 +34,7 @@ public class PriorityScheduler extends Scheduler {
     public PriorityScheduler() {
     }
     
+    
     /**
      * Allocate a new priority thread queue.
      *
@@ -337,7 +338,9 @@ public class PriorityScheduler extends Scheduler {
 		waitQueue.haslock = this;
 		donateQueue.add(waitQueue);
 		getEffectivePriority();
-	}	
+	}
+	
+	
 
 	/** The thread with which this object is associated. */	   
 	protected KThread thread;
@@ -350,4 +353,61 @@ public class PriorityScheduler extends Scheduler {
 	// --
 	
     }
+    
+	public static void selfTest() 
+	{
+
+		KThread thread1, thread2;
+		
+		 //  This runs t1 with priority 7, and t2 with priority 4, but
+		 //  half-way through t1's process its priority is lowered to 2.
+		
+		System.out.println( "Priority Scheduler Test:" );
+
+		thread1 = new KThread(new Runnable() 
+		{
+				public void run() 
+				{
+					System.out.println( KThread.currentThread().getName() + " started" );
+					for( int i = 0; i < 10; ++i ) 
+					{
+						System.out.println( KThread.currentThread().getName() + " working " + i );	
+						KThread.yield();
+						if( i == 4 ) 
+						{
+							System.out.println( KThread.currentThread().getName() + " changing priority" );
+							boolean int_state = Machine.interrupt().disable();
+							ThreadedKernel.scheduler.setPriority( 2 );
+							Machine.interrupt().restore( int_state );
+						}
+					}
+					System.out.println( KThread.currentThread().getName() + " finished" );
+				}
+		});
+
+		thread2 = new KThread(new Runnable() 
+		{
+				public void run() 
+				{
+					System.out.println( KThread.currentThread().getName() + " started" );
+					for( int i = 0; i < 10; ++i ) 
+					{
+						System.out.println( KThread.currentThread().getName() + " working " + i );	
+						KThread.yield();
+					}
+					System.out.println( KThread.currentThread().getName() + " finished" );
+				}
+
+		});
+
+		Machine.interrupt().disable();
+		ThreadedKernel.scheduler.setPriority( thread1, 7 );
+		ThreadedKernel.scheduler.setPriority( thread2, 4 );
+		Machine.interrupt().enable();
+
+		thread1.setName("1").fork();
+		thread2.setName("2").fork();
+		thread1.join();
+		thread2.join();
+	}
 }

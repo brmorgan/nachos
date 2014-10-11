@@ -79,46 +79,48 @@ public class Alarm {
 	//    KThread.yield();
     }
 
-    private static class Sleeps implements Runnable()
+    private static class Sleeps implements Runnable
     {
-	long waitingTo = 0;
+		long waitingTo = 0;
+		
+		public Sleeps(long t)
+		{
+			System.out.println("Thread waittime created");
+		    waitingTo = t;
+		}
 	
-	public Sleeps(long t)
-	{
-	    waitingTo = t;
-	}
-
-	public void run()
-	{
-	    System.out.println("Set to wait for" + waitingTo);
-	    //SO - Take the current time then call waitUntil with waitingTo
-	    long pre = Machine.timer().getTime();
-	    ThreadedKernel.alarm.waitUntil(waitingTo);
-	    long until = Machine.timer().getTime() - pre;
-	    System.out.println("It was supposed to wait for " + waitingTo + " ticks, and it waited for " + until - pre + " ticks.");
-	    
-	}
+		public void run()
+		{
+		    System.out.println("Set to wait for" + waitingTo);
+		    //SO - Take the current time then call waitUntil with waitingTo
+		    long pre = Machine.timer().getTime();
+		    ThreadedKernel.alarm.waitUntil(waitingTo);
+		    long until = Machine.timer().getTime() - pre;
+		    System.out.println("It was supposed to wait for " + waitingTo + " ticks, and it waited for " + (until - pre) + " ticks.");
+		    
+		}
     }
 
     public static void alarmTest()
     {
     	Lib.debug(dbgAlarm, "Entering Alarm.java's self test");
-
-	/* Test the waitUntil method with a set of times
-	    and compare the time waited to the time given 
-	    to wait.
-	*/
-
-	for(int i = 0; i > 7; i++)
-	{
-	    long t = 10000+(i*35);
-	    KThread thready = new KThread(new Sleeps(t));
-	    thready.setName("Thready-" + t);
-	    thready.fork();
-	}
+    	System.out.println("***Alarm test started***");
+		/* Test the waitUntil method with a set of times
+		    and compare the time waited to the time given 
+		    to wait.
+		*/
+	
+		for(int i = 0; i > 7; i++)
+		{
+		    long t = 10000+(i*35);
+		    KThread thready = new KThread(new Sleeps(t));
+		    thready.setName("Thready-" + t);
+		    thready.fork();
+		}
     }
     
     private LinkedList<Long> times;
     private HashMap<Long, KThread> waitingThreads;
+    private static final char dbgAlarm = 'a';
     
 }
