@@ -62,7 +62,7 @@ public class Boat
 		thread.setName("Adult #" + i);
 		thread.fork();
 	}
-	for(int i=0; i<adults; i++)
+	for(int i=0; i<children; i++)
 	{
 		Runnable r = new Runnable()
 		{
