@@ -485,7 +485,7 @@ public class KThread {
     private static int numCreated = 0;
 
     private static ThreadQueue readyQueue = null;
-    protected ThreadQueue joinQueue = null;
+    protected ThreadQueue joinQueue = ThreadedKernel.scheduler.newThreadQueue(true);
     private static KThread currentThread = null;
     private static KThread toBeDestroyed = null;
     private static KThread idleThread = null;
