@@ -437,13 +437,13 @@ public class KThread {
     	//SO - First step is to see what happens when a thread is joined before it is actually run.
     	KThread threadX = new KThread(new PingTest(1));
     	threadX.setName("threadX");
-    	threadX.join();
     	threadX.fork();
+    	threadX.join();
     	//SO - Next see what happens when the thread is joined after it is completed.
     	KThread threadY = new KThread(new PingTest(2));
     	threadY.setName("threadY");
     	threadY.fork();
-    	threadY.finish();
+    	threadY.yied();
     	threadY.join();
     	
 	
