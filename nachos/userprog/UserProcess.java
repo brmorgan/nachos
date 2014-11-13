@@ -5,6 +5,7 @@ import nachos.threads.*;
 import nachos.userprog.*;
 
 import java.io.EOFException;
+import java.util.LinkedList;
 
 /**
  * Encapsulates the state of a user process that is not contained in its
@@ -22,11 +23,15 @@ public class UserProcess {
     /**
      * Allocate a new process.
      */
-    public UserProcess() {
-	int numPhysPages = Machine.processor().getNumPhysPages();
-	pageTable = new TranslationEntry[numPhysPages];
-	for (int i=0; i<numPhysPages; i++)
-	    pageTable[i] = new TranslationEntry(i,i, true,false,false,false);
+    public UserProcess() 
+    {
+    	myPID = UserKernel.PID;
+    	UserKernel.PID++;
+    	
+    	int numPhysPages = Machine.processor().getNumPhysPages();
+    	pageTable = new TranslationEntry[numPhysPages];
+    	for (int i=0; i<numPhysPages; i++)
+    		pageTable[i] = new TranslationEntry(i,i, true,false,false,false);
     }
     
     /**
@@ -309,7 +314,18 @@ public class UserProcess {
     /**
      * Release any resources allocated by <tt>loadSections()</tt>.
      */
-    protected void unloadSections() {
+    protected void unloadSections() 
+    {
+    	// Added
+    	for(int i=0; i<pageTable.length; i++)
+    	{
+    		TranslationEntry myEntry = pageTable[i];
+    		if(myEntry.valid)
+    		{
+    			UserKernel.availablePages.add(myEntry.ppn);
+    		}
+    	}
+    	// --
     }    
 
     /**
@@ -340,6 +356,14 @@ public class UserProcess {
      */
     private int handleHalt()
     {
+    	// Added
+    	unloadSections();
+    	for(OpenFile file : fileTable)
+    	{
+    		if(file != null)
+    			file.close();
+    	}
+    	// --
     	Machine.halt();
 	
     	Lib.assertNotReached("Machine.halt() did not halt machine!");
@@ -348,12 +372,35 @@ public class UserProcess {
     
     private int handleExit(int exit)
     {
-    	return 0;
+    	unloadSections();
+    	for(OpenFile file : fileTable)
+    	{
+    		if(file != null)
+    			file.close();
+    	}
+    	if(myPID == 0)
+    		Machine.halt();
+    	
+    	KThread.finish();
+    	
+    	return exit;
     }
     
     private int handleExec(int name, int argc, int argv)
     {
-    	return 0;
+    	String[] args = new String[argc];
+    	for(int i = 0; i < argc; i++)
+    	{
+    		byte[] pointer = new byte[ADDRESSSIZE];
+    		readVirtualMemory(argv + i*ADDRESSSIZE, pointer);
+    		args[i] = readVirtualMemoryString(Lib.bytesToInt(pointer, 0), STRINGSIZE);
+    	}
+    	
+    	UserProcess child = new UserProcess();
+    	myChildren.add(child);
+    	String childName = readVirtualMemoryString(name, STRINGSIZE);
+    	
+    	return child.execute(childName, args) ? child.myPID : -1;
     }
     
     private int handleJoin(int pid)
@@ -506,4 +553,12 @@ public class UserProcess {
 	
     private static final int pageSize = Processor.pageSize;
     private static final char dbgProcess = 'a';
+    
+    // Added
+    private final int ADDRESSSIZE = 4;
+    private final int STRINGSIZE = 256;
+    protected int myPID;
+    protected OpenFile[] fileTable;
+    private LinkedList<UserProcess> myChildren = new LinkedList<UserProcess>();
+    // --
 }

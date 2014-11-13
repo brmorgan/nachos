@@ -1,5 +1,7 @@
 package nachos.userprog;
 
+import java.util.LinkedList;
+
 import nachos.machine.*;
 import nachos.threads.*;
 import nachos.userprog.*;
@@ -112,4 +114,9 @@ public class UserKernel extends ThreadedKernel {
 
     // dummy variables to make javac smarter
     private static Coff dummy1 = null;
+    
+    // An array of free pages numbers
+    public static LinkedList<Integer> availablePages = new LinkedList<Integer>();
+    // Keeps track of the current PID
+    protected static int PID = 0;
 }
