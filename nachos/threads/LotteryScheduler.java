@@ -26,11 +26,67 @@ import java.util.Iterator;
  * Unlike a priority scheduler, these tickets add (as opposed to just taking
  * the maximum).
  */
-public class LotteryScheduler extends PriorityScheduler {
+public class LotteryScheduler extends PriorityScheduler 
+{
+	public static final int MINPRIORITY = 1;
+	public static final int MAXPRIORITY = Integer.MAX_VALUE;
+	
     /**
      * Allocate a new lottery scheduler.
      */
-    public LotteryScheduler() {
+    public LotteryScheduler() 
+    {
+    	
+    }
+    
+    public void setPriority(KThread thread, int priority)
+    {
+    	Lib.assertTrue(Machine.interrupt().disabled());
+	    Lib.assertTrue(priority >= MINPRIORITY );
+	    getThreadState(thread).setPriority(priority);
+    }
+    
+    public boolean increasePriority()
+    {
+    	Machine.interrupt().disable();
+    	
+    	KThread thread = KThread.currentThread();
+    	int priority = getPriority(thread);
+    	if(priority == MAXPRIORITY)
+    		return false;
+    	setPriority(thread, priority+1);
+    	
+    	Machine.interrupt().enable();
+    	return true;
+    }
+    
+    public boolean decreasePriority()
+    {
+    	Machine.interrupt().disable();
+    	
+    	KThread thread = KThread.currentThread();
+    	int priority = getPriority(thread);
+    	if(priority == MINPRIORITY)
+    		return false;
+    	setPriority(thread, priority-1);
+    	
+    	Machine.interrupt().enable();
+    	return true;
+    }
+    
+    public int getEffectivePriority(ThreadState mystate)
+    {
+    	int tickets = mystate.priority;
+    	for(PriorityQueue myQueue: mystate.donateQueue)
+    	{
+    		for(KThread currentThread : myQueue.waitQueue)
+    		{
+    			if(getThreadState(currentThread) == mystate)
+    				continue;
+    			tickets += getThreadState(currentThread).getEffectivePriority();
+    		}
+    	}
+    	return tickets;
     }
     
     /**
@@ -41,8 +97,9 @@ public class LotteryScheduler extends PriorityScheduler {
      *					to the owning thread.
      * @return	a new lottery thread queue.
      */
-    public ThreadQueue newThreadQueue(boolean transferPriority) {
-	// implement me
-	return null;
-    }
+//    public ThreadQueue newThreadQueue(boolean transferPriority) 
+//    {
+//    	// implement me
+//    	return null;
+//    }
 }
