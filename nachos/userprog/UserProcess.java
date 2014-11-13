@@ -372,6 +372,7 @@ public class UserProcess {
     
     private int handleExit(int exit)
     {
+    	myExitStatus = exit;
     	unloadSections();
     	for(OpenFile file : fileTable)
     	{
@@ -405,37 +406,116 @@ public class UserProcess {
     
     private int handleJoin(int pid)
     {
-    	return 0;
+    	for(UserProcess child : myChildren)
+    	{
+    		if(child.myPID == pid)
+    		{
+    			myChildren.remove(child);
+    			return child.myExitStatus;
+    		}
+    	}
+    	return -1;
     }
     
     private int handleCreate(int name)
     {
-    	return 0;
+    	String filename = readVirtualMemoryString(name, STRINGSIZE);
+    	OpenFile file = Machine.stubFileSystem().open(filename, true);
+    	if(file != null)
+    	{
+    		for(int i = 2; i < fileTable.length; i++)
+    		{
+    			if(fileTable[i] == null)
+    			{
+    				fileTable[i] = file;
+    				return i;
+    			}
+    		}
+    	}
+    	
+    	return -1;
     }
     
     private int handleOpen(int name)
     {
-    	return 0;
+    	String filename = readVirtualMemoryString(name, STRINGSIZE);
+    	OpenFile file = Machine.stubFileSystem().open(filename, true);
+    	if(file != null)
+    	{
+    		for(int i = 2; i < fileTable.length; i++)
+    		{
+    			if(fileTable[i] == null)
+    			{
+    				fileTable[i] = file;
+    				return i;
+    			}
+    		}
+    	}
+    	
+    	return -1;
     }
     
     private int handleRead(int fd, int buffer, int size)
     {
-    	return 0;
+    	OpenFile file = fileTable[fd];
+    	if(file == null)
+    		return -1;
+    	
+    	byte[] tempbuff = new byte[size];
+    	int readsize = file.read(tempbuff, 0, size);
+    	
+    	writeVirtualMemory(buffer, tempbuff);
+    	
+    	return readsize;
     }
     
     private int handleWrite(int fd, int buffer, int size)
     {
-    	return 0;
+    	OpenFile file = fileTable[fd];
+    	if(file == null)
+    		return -1;
+    	
+    	byte[] tempbuff = new byte[size];
+    	readVirtualMemory(buffer, tempbuff);
+    	
+    	return file.write(tempbuff, 0, size);
     }
     
     private int handleClose(int fd)
     {
+    	OpenFile file = fileTable[fd];
+    	if(file != null)
+    	{
+    		fileTable[fd].close();
+    		fileTable[fd] = null;
+    		return fd;
+    	}
     	return 0;
     }
     
     private int handleUnlink(int fd)
     {
-    	return 0;
+    	try
+    	{
+    		String name = readVirtualMemoryString(fd, STRINGSIZE);
+    		if(name == null || name.length() == 0)
+    		{
+    			return -1;
+    		}
+    		FileSystem fs = Machine.stubFileSystem();
+    		if(fs.remove(name))
+    		{
+    			return 0;
+    		}
+    		else
+    		{
+    			return -1;
+    		}
+    	}
+    	catch(Exception e)
+    	{
+    		return -1;
+    	}
     }
     
     private static final int
@@ -555,6 +635,7 @@ public class UserProcess {
     private static final char dbgProcess = 'a';
     
     // Added
+    public int myExitStatus;
     private final int ADDRESSSIZE = 4;
     private final int STRINGSIZE = 256;
     protected int myPID;
