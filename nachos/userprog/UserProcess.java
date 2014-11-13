@@ -338,17 +338,61 @@ public class UserProcess {
     /**
      * Handle the halt() system call. 
      */
-    private int handleHalt() {
-
-	Machine.halt();
+    private int handleHalt()
+    {
+    	Machine.halt();
 	
-	Lib.assertNotReached("Machine.halt() did not halt machine!");
-	return 0;
+    	Lib.assertNotReached("Machine.halt() did not halt machine!");
+    	return 0;
     }
-
-
+    
+    private int handleExit(int exit)
+    {
+    	return 0;
+    }
+    
+    private int handleExec(int name, int argc, int argv)
+    {
+    	return 0;
+    }
+    
+    private int handleJoin(int pid)
+    {
+    	return 0;
+    }
+    
+    private int handleCreate(int name)
+    {
+    	return 0;
+    }
+    
+    private int handleOpen(int name)
+    {
+    	return 0;
+    }
+    
+    private int handleRead(int fd, int buffer, int size)
+    {
+    	return 0;
+    }
+    
+    private int handleWrite(int fd, int buffer, int size)
+    {
+    	return 0;
+    }
+    
+    private int handleClose(int fd)
+    {
+    	return 0;
+    }
+    
+    private int handleUnlink(int fd)
+    {
+    	return 0;
+    }
+    
     private static final int
-        syscallHalt = 0,
+    syscallHalt = 0,
 	syscallExit = 1,
 	syscallExec = 2,
 	syscallJoin = 3,
@@ -391,8 +435,24 @@ public class UserProcess {
 	switch (syscall) {
 	case syscallHalt:
 	    return handleHalt();
-
-
+    case syscallExit:
+        return handleExit(a0);
+    case syscallExec:
+        return handleExec(a0,a1,a2);
+    case syscallJoin:
+        return handleJoin(a0);
+    case syscallCreate:
+        return handleCreate(a0);
+    case syscallOpen:
+        return handleOpen(a0);
+    case syscallRead:
+        return handleRead(a0,a1,a2);
+    case syscallWrite:
+        return handleWrite(a0,a1,a2);
+    case syscallClose:
+        return handleClose(a0);
+    case syscallUnlink:
+    	return handleUnlink(a0);
 	default:
 	    Lib.debug(dbgProcess, "Unknown syscall " + syscall);
 	    Lib.assertNotReached("Unknown system call!");
